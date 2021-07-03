@@ -19,13 +19,37 @@ public class AddEvent extends AppCompatActivity {
         Intent intent = getIntent();
     }
 
+    /****************************************************************
+     * Create Event
+     * Description: Takes the values stored in the event variable and
+     *      serialized them as a json file.
+     ***************************************************************/
     private void createEvent(View view)
+    {
+        if (authenticateEvent())
+            System.out.println("You're not supposed to be here!");
+    }
+
+    /****************************************************************
+     * Populate Date
+     * Description: Fills the date field in with the date that was
+     *      selected when the view was started.
+     * @param activity The main activity.
+     ***************************************************************/
+    private void populateDate(Activity activity)
     {
 
     }
 
-    private void populateDate(Activity activity)
+    /****************************************************************
+     * Authenticate Event
+     * Description: Grabs the values of the title, address, date, and
+     *      time and ensures they are valid.
+     * @return returns true or false depending on whether or not the
+     *      values in the checked fields were valid.
+     ***************************************************************/
+    private boolean authenticateEvent()
     {
-
+        return false;
     }
 }

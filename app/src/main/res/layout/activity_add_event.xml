@@ -4,11 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="#00FFE7"
     tools:context=".AddEvent">
 
     <EditText
-        android:id="@+id/title_field"
-        android:layout_width="300dp"
+        android:id="@+id/event_title_field"
+        android:layout_width="275dp"
         android:layout_height="50dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
@@ -23,20 +24,21 @@
         android:layout_marginEnd="8dp"
         android:text="Title"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/title_field"
-        app:layout_constraintEnd_toStartOf="@+id/title_field"
-        app:layout_constraintTop_toTopOf="@+id/title_field" />
+        app:layout_constraintBottom_toBottomOf="@+id/event_title_field"
+        app:layout_constraintEnd_toStartOf="@+id/event_title_field"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/event_title_field" />
 
     <EditText
-        android:id="@+id/editTextTextPostalAddress"
-        android:layout_width="300dp"
+        android:id="@+id/event_address_field"
+        android:layout_width="275dp"
         android:layout_height="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:inputType="textPostalAddress"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title_field" />
+        app:layout_constraintTop_toBottomOf="@+id/event_title_field" />
 
     <TextView
         android:id="@+id/textView3"
@@ -45,20 +47,21 @@
         android:layout_marginEnd="8dp"
         android:text="Address"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextTextPostalAddress"
-        app:layout_constraintEnd_toStartOf="@+id/editTextTextPostalAddress"
-        app:layout_constraintTop_toTopOf="@+id/editTextTextPostalAddress" />
+        app:layout_constraintBottom_toBottomOf="@+id/event_address_field"
+        app:layout_constraintEnd_toStartOf="@+id/event_address_field"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/event_address_field" />
 
     <EditText
-        android:id="@+id/editTextDate"
-        android:layout_width="300dp"
+        android:id="@+id/event_date_field"
+        android:layout_width="275dp"
         android:layout_height="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:inputType="date"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextTextPostalAddress" />
+        app:layout_constraintTop_toBottomOf="@+id/event_address_field" />
 
     <TextView
         android:id="@+id/textView4"
@@ -67,20 +70,21 @@
         android:layout_marginEnd="8dp"
         android:text="Date"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextDate"
-        app:layout_constraintEnd_toStartOf="@+id/editTextDate"
-        app:layout_constraintTop_toTopOf="@+id/editTextDate" />
+        app:layout_constraintBottom_toBottomOf="@+id/event_date_field"
+        app:layout_constraintEnd_toStartOf="@+id/event_date_field"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/event_date_field" />
 
     <EditText
-        android:id="@+id/editTextTime"
-        android:layout_width="300dp"
+        android:id="@+id/event_time_field"
+        android:layout_width="275dp"
         android:layout_height="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:inputType="time"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextDate" />
+        app:layout_constraintTop_toBottomOf="@+id/event_date_field" />
 
     <TextView
         android:id="@+id/textView5"
@@ -89,8 +93,21 @@
         android:layout_marginEnd="8dp"
         android:text="Time"
         android:textSize="20sp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextTime"
-        app:layout_constraintEnd_toStartOf="@+id/editTextTime"
-        app:layout_constraintTop_toTopOf="@+id/editTextTime" />
+        app:layout_constraintBottom_toBottomOf="@+id/event_time_field"
+        app:layout_constraintEnd_toStartOf="@+id/event_time_field"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/event_time_field" />
+
+    <Button
+        android:id="@+id/add_event_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#009688"
+        android:text="Add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

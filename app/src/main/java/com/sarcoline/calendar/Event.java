@@ -6,12 +6,12 @@ import java.util.Date;
 
 public class Event {
     @SerializedName("title")
-    String title;
+    public String title;
     @SerializedName("group-id")
-    int groupId;
+    public int groupId;
     @SerializedName("date")
-    Date Date;
+    public Date Date;
     @SerializedName("address")
-    String address;
+    public String address;
 
 }
