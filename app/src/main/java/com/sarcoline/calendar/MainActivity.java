@@ -12,13 +12,21 @@ import android.widget.TextView;
 
 import com.google.android.material.navigation.NavigationView;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    protected Date SELECTED_DATE = Calendar.getInstance().getTime();
+    protected LocalDateTime CURRENT_DATE;
     private Bundle calendarBundle;
+
+    public MainActivity()
+    {
+        CURRENT_DATE = LocalDateTime.now();
+        calendarBundle = new Bundle();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,8 +42,6 @@ public class MainActivity extends AppCompatActivity {
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
             @Override
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                SELECTED_DATE = new Date(view.getDate());
-                calendarBundle = new Bundle();
                 calendarBundle.putInt("year", year);
                 calendarBundle.putInt("month", month);
                 calendarBundle.putInt("dayOfMonth", dayOfMonth);
@@ -43,11 +49,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void verifyBundle()
+    {
+        calendarBundle.putLong("date", CURRENT_DATE.getLong(ChronoField.EPOCH_DAY));
+        if (calendarBundle.getInt("year") == 0)
+            calendarBundle.putInt("year", CURRENT_DATE.getYear());
+        if (calendarBundle.getInt("month") == 0)
+            calendarBundle.putInt("month", CURRENT_DATE.getMonthValue());
+        if (calendarBundle.getInt("dayOfMonth") == 0)
+            calendarBundle.putInt("dayOfMonth", CURRENT_DATE.getDayOfMonth());
+    }
+
     public void createEvent(View view)
     {
-        CalendarView calendarView = (CalendarView) findViewById(R.id.monthCal);
-        calendarBundle.putLong("date", calendarView.getDate());
         Intent intent = new Intent(this, AddEvent.class);
+        verifyBundle();
         intent.putExtras(calendarBundle);
         startActivity(intent);
     }
