@@ -7,12 +7,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.gson.Gson;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.TimeZone;
+import java.util.List;
 
 public class AddEvent extends AppCompatActivity {
 
@@ -20,6 +27,24 @@ public class AddEvent extends AppCompatActivity {
     private LocalDateTime currentDate;
     private LocalDateTime givenDate;
     private Intent intent;
+
+    private String removeWhitespace(String string)
+    {
+        String newString = new String();
+        for (int i = 0; i < string.length(); i++)
+        {
+            if (Character.isWhitespace(string.charAt(i)))
+            {
+                newString += '_';
+            }
+            else
+            {
+                newString += string.charAt(i);
+            }
+
+        }
+        return newString;
+    }
 
     public AddEvent()
     {
@@ -36,12 +61,14 @@ public class AddEvent extends AppCompatActivity {
         if (b != null)
         {
             this.givenDate = LocalDateTime.of(b.getInt("year"), b.getInt("month"), b.getInt("dayOfMonth"), 0,0);
-            this.currentDate = LocalDateTime.ofInstant(new Date(b.getLong("date")).toInstant(), ZoneId.systemDefault());
+            this.currentDate = LocalDateTime.now();
             if (!givenDate.toLocalDate().equals(currentDate.toLocalDate()))
                 populateDate(givenDate);
             else
                 populateDate(currentDate);
         }
+
+        event = new Event();
 
         populateTime();
     }
@@ -51,10 +78,43 @@ public class AddEvent extends AppCompatActivity {
      * Description: Takes the values stored in the event variable and
      *      serialized them as a json file.
      ***************************************************************/
-    private void createEvent(View view)
+    public void createEvent(View view)
     {
+        final String fileSeparator = System.getProperty("file.separator");
+        String directory = fileSeparator + getFilesDir() + fileSeparator + currentDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
         if (authenticateEvent() != null)
-            System.out.println("You're not supposed to be here!");
+        {
+            System.out.println("authenticated");
+            File path = new File(directory);
+            Gson gson = new Gson();
+            String eventJson = gson.toJson(event);
+            try
+            {
+                int nameIteration = 1;
+
+                if (!path.exists())
+                    path.mkdir();
+
+                String file = fileSeparator + removeWhitespace(event.title) + ".json";
+                path = new File(directory + file);
+
+                while (path.exists())
+                {
+                    file = fileSeparator + removeWhitespace(event.title) + ++nameIteration + ".json";
+                    path = new File(directory + file);
+                }
+
+                FileWriter writer = new FileWriter(path);
+                writer.write(eventJson);
+                writer.close();
+                System.out.println("file written to: " + path.toString());
+                finish();
+            } catch (IOException e)
+            {
+                System.out.println("File could not be written. Error: " + e.getMessage());
+            }
+        }
     }
 
     /****************************************************************
@@ -91,19 +151,31 @@ public class AddEvent extends AppCompatActivity {
      ***************************************************************/
     private Event authenticateEvent()
     {
+        EditText titleField = (EditText) findViewById(R.id.event_title_field);
+        EditText addressField = (EditText) findViewById(R.id.event_address_field);
         EditText dateField = (EditText) findViewById(R.id.event_date_field);
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
-        String[] newDate = format.format(dateField.getText()).split("\\/");
-        int[] dateInts = new int[3];
+        EditText timeField = (EditText) findViewById(R.id.event_time_field);
 
-        if (newDate.length == 3) {
-            for (int i = 0; i < 3; i++) {
-                dateInts[i] = Integer.parseInt(newDate[i]);
-                System.out.println(dateInts[i]);
-            }
+        if (titleField.getText().toString() != "")
+        {
+            event.title = titleField.getText().toString();
+            System.out.println("The event title is: " + event.title);
+            System.out.println("The title variable in the event object is: " + event.title);
         }
-        else if (newDate.length > 3 || newDate.length < 3)
-            return null;
+
+        if (addressField.getText().toString() != "")
+            event.address = titleField.getText().toString();
+
+        try
+        {
+
+            Date eventDate = new SimpleDateFormat("MM/dd/yyyy HH:mm").parse(dateField.getText().toString() + ' ' + timeField.getText().toString());
+            event.date = eventDate;
+        }
+        catch (ParseException e)
+        {
+            System.out.println("Error parsing values in date field: " + e.getLocalizedMessage());
+        }
 
         return new Event();
     }
