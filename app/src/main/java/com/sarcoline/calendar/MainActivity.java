@@ -2,6 +2,8 @@ package com.sarcoline.calendar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,11 +23,24 @@ public class MainActivity extends AppCompatActivity {
 
     protected LocalDateTime CURRENT_DATE;
     private Bundle calendarBundle;
+    private RecyclerView eventRecycler;
+    private RecyclerView.Adapter eRecyclerAdapter;
 
     public MainActivity()
     {
         CURRENT_DATE = LocalDateTime.now();
         calendarBundle = new Bundle();
+    }
+
+    private void verifyBundle()
+    {
+        calendarBundle.putLong("date", CURRENT_DATE.getLong(ChronoField.EPOCH_DAY));
+        if (calendarBundle.getInt("year") == 0)
+            calendarBundle.putInt("year", CURRENT_DATE.getYear());
+        if (calendarBundle.getInt("month") == 0)
+            calendarBundle.putInt("month", CURRENT_DATE.getMonthValue());
+        if (calendarBundle.getInt("dayOfMonth") == 0)
+            calendarBundle.putInt("dayOfMonth", CURRENT_DATE.getDayOfMonth());
     }
 
     @Override
@@ -47,17 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 calendarBundle.putInt("dayOfMonth", dayOfMonth);
             }
         });
-    }
-
-    private void verifyBundle()
-    {
-        calendarBundle.putLong("date", CURRENT_DATE.getLong(ChronoField.EPOCH_DAY));
-        if (calendarBundle.getInt("year") == 0)
-            calendarBundle.putInt("year", CURRENT_DATE.getYear());
-        if (calendarBundle.getInt("month") == 0)
-            calendarBundle.putInt("month", CURRENT_DATE.getMonthValue());
-        if (calendarBundle.getInt("dayOfMonth") == 0)
-            calendarBundle.putInt("dayOfMonth", CURRENT_DATE.getDayOfMonth());
     }
 
     public void createEvent(View view)

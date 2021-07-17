@@ -24,4 +24,19 @@ public class Event {
         address = "Not set";
     }
 
+    public boolean isBefore(Event event)
+    {
+        if (date.before(event.date))
+            return true;
+        else
+            return false;
+    }
+
+    public boolean isAfter(Event event)
+    {
+        if (date.after(event.date))
+            return true;
+        else
+            return false;
+    }
 }

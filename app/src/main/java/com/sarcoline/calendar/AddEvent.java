@@ -28,6 +28,12 @@ public class AddEvent extends AppCompatActivity {
     private LocalDateTime givenDate;
     private Intent intent;
 
+    /****************************************************************
+     * Remove Whitespace
+     * Description: Removes whitespaces from a string.
+     * @param string The string that to remove spaces from.
+     * @return The string with spaces removed.
+     ***************************************************************/
     private String removeWhitespace(String string)
     {
         String newString = new String();
@@ -41,80 +47,8 @@ public class AddEvent extends AppCompatActivity {
             {
                 newString += string.charAt(i);
             }
-
         }
         return newString;
-    }
-
-    public AddEvent()
-    {
-
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_event);
-
-        this.intent = getIntent();
-        Bundle b = intent.getExtras();
-        if (b != null)
-        {
-            this.givenDate = LocalDateTime.of(b.getInt("year"), b.getInt("month"), b.getInt("dayOfMonth"), 0,0);
-            this.currentDate = LocalDateTime.now();
-            if (!givenDate.toLocalDate().equals(currentDate.toLocalDate()))
-                populateDate(givenDate);
-            else
-                populateDate(currentDate);
-        }
-
-        event = new Event();
-
-        populateTime();
-    }
-
-    /****************************************************************
-     * Create Event
-     * Description: Takes the values stored in the event variable and
-     *      serialized them as a json file.
-     ***************************************************************/
-    public void createEvent(View view)
-    {
-        final String fileSeparator = System.getProperty("file.separator");
-        String directory = fileSeparator + getFilesDir() + fileSeparator + currentDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
-
-        if (authenticateEvent() != null)
-        {
-            System.out.println("authenticated");
-            File path = new File(directory);
-            Gson gson = new Gson();
-            String eventJson = gson.toJson(event);
-            try
-            {
-                int nameIteration = 1;
-
-                if (!path.exists())
-                    path.mkdir();
-
-                String file = fileSeparator + removeWhitespace(event.title) + ".json";
-                path = new File(directory + file);
-
-                while (path.exists())
-                {
-                    file = fileSeparator + removeWhitespace(event.title) + ++nameIteration + ".json";
-                    path = new File(directory + file);
-                }
-
-                FileWriter writer = new FileWriter(path);
-                writer.write(eventJson);
-                writer.close();
-                System.out.println("file written to: " + path.toString());
-                finish();
-            } catch (IOException e)
-            {
-                System.out.println("File could not be written. Error: " + e.getMessage());
-            }
-        }
     }
 
     /****************************************************************
@@ -177,6 +111,77 @@ public class AddEvent extends AppCompatActivity {
             System.out.println("Error parsing values in date field: " + e.getLocalizedMessage());
         }
 
-        return new Event();
+        return event;
+    }
+
+    public AddEvent()
+    {
+
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_event);
+
+        this.intent = getIntent();
+        Bundle b = intent.getExtras();
+        if (b != null)
+        {
+            this.givenDate = LocalDateTime.of(b.getInt("year"), b.getInt("month"), b.getInt("dayOfMonth"), 0,0);
+            this.currentDate = LocalDateTime.now();
+            if (!givenDate.toLocalDate().equals(currentDate.toLocalDate()))
+                populateDate(givenDate);
+            else
+                populateDate(currentDate);
+        }
+
+        event = new Event();
+
+        populateTime();
+    }
+
+    /****************************************************************
+     * Create Event
+     * Description: Takes the values stored in the event variable and
+     *      serialized them as a json file.
+     ***************************************************************/
+    public void createEvent(View view)
+    {
+        final String fileSeparator = System.getProperty("file.separator");
+        String directory = fileSeparator + getFilesDir() + fileSeparator + givenDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+
+        if (authenticateEvent() != null)
+        {
+            System.out.println("authenticated");
+            File path = new File(directory);
+            Gson gson = new Gson();
+            String eventJson = gson.toJson(event);
+            try
+            {
+                int nameIteration = 1;
+
+                if (!path.exists())
+                    path.mkdir();
+
+                String file = fileSeparator + removeWhitespace(event.title) + ".json";
+                path = new File(directory + file);
+
+                while (path.exists())
+                {
+                    file = fileSeparator + removeWhitespace(event.title) + ++nameIteration + ".json";
+                    path = new File(directory + file);
+                }
+
+                FileWriter writer = new FileWriter(path);
+                writer.write(eventJson);
+                writer.close();
+                System.out.println("file written to: " + path.toString());
+                finish();
+            } catch (IOException e)
+            {
+                System.out.println("File could not be written. Error: " + e.getMessage());
+            }
+        }
     }
 }
