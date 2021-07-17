@@ -17,9 +17,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class AddEvent extends AppCompatActivity {
 
@@ -98,13 +96,15 @@ public class AddEvent extends AppCompatActivity {
         }
 
         if (addressField.getText().toString() != "")
-            event.address = titleField.getText().toString();
+            event.address = addressField.getText().toString();
 
         try
         {
 
             Date eventDate = new SimpleDateFormat("MM/dd/yyyy HH:mm").parse(dateField.getText().toString() + ' ' + timeField.getText().toString());
-            event.date = eventDate;
+            System.out.println("saved date for new event is: " + eventDate.toString());
+            LocalDateTime ldt = LocalDateTime.ofInstant(eventDate.toInstant(), ZoneId.systemDefault());
+            event.date = Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
         }
         catch (ParseException e)
         {
@@ -153,7 +153,6 @@ public class AddEvent extends AppCompatActivity {
 
         if (authenticateEvent() != null)
         {
-            System.out.println("authenticated");
             File path = new File(directory);
             Gson gson = new Gson();
             String eventJson = gson.toJson(event);
@@ -173,6 +172,7 @@ public class AddEvent extends AppCompatActivity {
                     path = new File(directory + file);
                 }
 
+                System.out.println(event.date.toString());
                 FileWriter writer = new FileWriter(path);
                 writer.write(eventJson);
                 writer.close();
