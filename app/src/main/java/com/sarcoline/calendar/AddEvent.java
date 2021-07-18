@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 
@@ -14,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +27,8 @@ public class AddEvent extends AppCompatActivity {
     private LocalDateTime currentDate;
     private LocalDateTime givenDate;
     private Intent intent;
+    private EditText timeField;
+    private EditText dateField;
 
     /****************************************************************
      * Remove Whitespace
@@ -85,8 +89,6 @@ public class AddEvent extends AppCompatActivity {
     {
         EditText titleField = (EditText) findViewById(R.id.event_title_field);
         EditText addressField = (EditText) findViewById(R.id.event_address_field);
-        EditText dateField = (EditText) findViewById(R.id.event_date_field);
-        EditText timeField = (EditText) findViewById(R.id.event_time_field);
 
         if (titleField.getText().toString() != "")
         {
@@ -124,6 +126,9 @@ public class AddEvent extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
 
+        timeField = (EditText) findViewById(R.id.event_time_field);
+        dateField = (EditText) findViewById(R.id.event_date_field);
+
         this.intent = getIntent();
         Bundle b = intent.getExtras();
         if (b != null)
@@ -149,7 +154,9 @@ public class AddEvent extends AppCompatActivity {
     public void createEvent(View view)
     {
         final String fileSeparator = System.getProperty("file.separator");
-        String directory = fileSeparator + getFilesDir() + fileSeparator + givenDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+        LocalDate tempDate = LocalDate.parse(dateField.getText().toString(), DateTimeFormatter.ofPattern("MM/dd/yyyy"));
+        System.out.println("date gotten from user is: " + tempDate.toString());
+        String directory = getFilesDir() + fileSeparator + tempDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
 
         if (authenticateEvent() != null)
         {

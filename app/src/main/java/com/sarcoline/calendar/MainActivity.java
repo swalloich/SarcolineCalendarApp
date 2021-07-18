@@ -7,11 +7,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.CalendarView;
+import android.widget.PopupMenu;
 
-import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
 import java.io.File;
@@ -24,13 +25,15 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     protected LocalDateTime CURRENT_DATE;
     private Bundle calendarBundle;
     private RecyclerView eventRecycler;
     private RecyclerView.Adapter eRecyclerAdapter;
     private RecyclerView.LayoutManager eRecyclerManager;
+    private File dateDirectory;
+    private LocalDateTime selectedDate;
 
     public MainActivity()
     {
@@ -122,7 +125,31 @@ public class MainActivity extends AppCompatActivity {
                     events.add(makeEvent(file));
             }
         }
-        return events;
+        return sortEvents(events);
+    }
+
+    private ArrayList<Event> sortEvents(ArrayList<Event> events)
+    {
+        ArrayList<Event> sortedEvents = new ArrayList<>();
+        Event earliestEvent;
+        while (events.size() > 0)
+        {
+            earliestEvent = events.get(0);
+            for (Event currentEvent : events)
+            {
+                if (!earliestEvent.equals(currentEvent) && currentEvent.isBefore(earliestEvent))
+                    earliestEvent = currentEvent;
+            }
+            sortedEvents.add(earliestEvent);
+            events.remove(earliestEvent);
+        }
+        return sortedEvents;
+    }
+
+    private void updateRecycler(File newDir)
+    {
+        eRecyclerAdapter = new EventAdapter(getEvents(newDir));
+        eventRecycler.setAdapter(eRecyclerAdapter);
     }
 
     @Override
@@ -131,23 +158,18 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         CURRENT_DATE = LocalDateTime.now();
-
-        NavigationView navView = (NavigationView) findViewById(R.id.nav_view);
-        Menu m1 = navView.getMenu();
-        m1.add(R.id.navGroup1, 1, 100, "Month");
-        m1.add(R.id.navGroup1, 2, 200, "Week");
+        selectedDate = CURRENT_DATE;
 
         final String fileSeparator = System.getProperty("file.separator");
-        File todayDir = new File(fileSeparator + getFilesDir()
+        dateDirectory = new File(fileSeparator + getFilesDir()
                 + fileSeparator + CURRENT_DATE.format(DateTimeFormatter.ISO_LOCAL_DATE)
                 + fileSeparator);
 
         eventRecycler = (RecyclerView) findViewById(R.id.events_recycler);
         eventRecycler.setHasFixedSize(true);
         eRecyclerManager = new LinearLayoutManager(this);
-        eRecyclerAdapter = new EventAdapter(getEvents(todayDir));
         eventRecycler.setLayoutManager(eRecyclerManager);
-        eventRecycler.setAdapter(eRecyclerAdapter);
+        updateRecycler(dateDirectory);
 
         CalendarView cal = (CalendarView) findViewById(R.id.monthCal);
         cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
@@ -155,26 +177,65 @@ public class MainActivity extends AppCompatActivity {
             public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
                 final String fileSeparator = System.getProperty("file.separator");
                 calendarBundle.putInt("year", year);
-                calendarBundle.putInt("month", month);
+                calendarBundle.putInt("month", month + 1);
                 calendarBundle.putInt("dayOfMonth", dayOfMonth);
 
+                //for debugging
+                selectedDate = LocalDateTime.of(year,month,dayOfMonth,0,0);
+                System.out.println(selectedDate.format(DateTimeFormatter.ofPattern("LLL dd uuuu")));
+
                 LocalDateTime selectedDate = LocalDateTime.of(year,month + 1,dayOfMonth,0,0);
-                File currentDir = new File(fileSeparator + getFilesDir()
+                dateDirectory = new File(fileSeparator + getFilesDir()
                         + fileSeparator + selectedDate.format(DateTimeFormatter.ISO_LOCAL_DATE)
                         + fileSeparator);
-                System.out.println("selectedDate: " + selectedDate.format(DateTimeFormatter.ofPattern("LLL dd, yyyy")));
-                System.out.println("checked directory has been updated to: " + currentDir.toString());
-                eRecyclerAdapter = new EventAdapter(getEvents(currentDir));
-                eventRecycler.setAdapter(eRecyclerAdapter);
+                updateRecycler(dateDirectory);
             }
         });
     }
 
-    public void createEvent(View view)
+    public void addButton(View view)
+    {
+        PopupMenu addMenu = new PopupMenu(this, view);
+        MenuInflater inflater = addMenu.getMenuInflater();
+        inflater.inflate(R.menu.add_menu, addMenu.getMenu());
+        addMenu.setOnMenuItemClickListener(this);
+        addMenu.show();
+    }
+
+    private void createEvent()
     {
         Intent intent = new Intent(this, AddEvent.class);
         verifyBundle();
         intent.putExtras(calendarBundle);
         startActivity(intent);
+    }
+
+    private void createGroup()
+    {
+        Intent intent = new Intent(this, CreateGroup.class);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        updateRecycler(dateDirectory);
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.new_event_option:
+                createEvent();
+                return true;
+            case R.id.new_group_option:
+                createGroup();
+                return true;
+            default:
+                return false;
+        }
     }
 }
